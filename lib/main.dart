@@ -1,4 +1,3 @@
-import 'package:flavorist/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'theme.dart';
 import 'screens/login_screen.dart';
