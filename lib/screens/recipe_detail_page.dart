@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:share_plus/share_plus.dart';
 import '../constant/colors.dart';
 
 class RecipeDetailPage extends StatelessWidget {
@@ -56,15 +58,15 @@ class RecipeDetailPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.favorite_border,
-                    color: AppColors.pinkPrimary,
-                  ),
-                  onPressed: () {
-                    // TODO: Tambah ke favorit
-                  },
-                ),
+                // child: IconButton(
+                //   icon: const Icon(
+                //     Icons.favorite_border,
+                //     color: AppColors.pinkPrimary,
+                //   ),
+                //   onPressed: () {
+                //     // TODO: Tambah ke favorit
+                //   },
+                // ),
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -73,8 +75,8 @@ class RecipeDetailPage extends StatelessWidget {
                 children: [
                   // Banner Image
                   imagePath != null && imagePath!.isNotEmpty
-                      ? Image.network(
-                          imagePath!,
+                      ? Image.file(
+                          File(imagePath!),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return _buildPlaceholderImage();
@@ -244,63 +246,69 @@ class RecipeDetailPage extends StatelessWidget {
                     // Tombol Action
                     Row(
                       children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              // TODO: Share recipe
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Bagikan resep")),
-                              );
-                            },
-                            icon: const Icon(Icons.share, color: Colors.white),
-                            label: const Text(
-                              "Bagikan",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.pinkPrimary,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
+//                         Expanded(
+//                           child: ElevatedButton.icon(
+//                             onPressed: () async {
+//                               final recipeText = """
+// *${title}*
+
+// *Bahan-bahan:*
+// ${ingredients}
+
+// *Langkah Memasak:*
+// ${description}
+// """;
+//                               await Share.share(recipeText, subject: 'Coba resep ini: $title');
+//                             },
+//                             icon: const Icon(Icons.share, color: Colors.white),
+//                             label: const Text(
+//                               "Bagikan",
+//                               style: TextStyle(
+//                                 fontWeight: FontWeight.bold,
+//                                 color: Colors.white,
+//                               ),
+//                             ),
+//                             style: ElevatedButton.styleFrom(
+//                               backgroundColor: AppColors.pinkPrimary,
+//                               padding: const EdgeInsets.symmetric(vertical: 14),
+//                               shape: RoundedRectangleBorder(
+//                                 borderRadius: BorderRadius.circular(12),
+//                               ),
+//                             ),
+//                           ),
+//                         ),
                         const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              // TODO: Edit recipe
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Edit resep")),
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.edit,
-                              color: AppColors.pinkDark,
-                            ),
-                            label: const Text(
-                              "Edit",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.pinkDark,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: const BorderSide(
-                                color: AppColors.pinkPrimary,
-                                width: 2,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: OutlinedButton.icon(
+                        //     onPressed: () {
+                        //       // TODO: Edit recipe
+                        //       ScaffoldMessenger.of(context).showSnackBar(
+                        //         const SnackBar(content: Text("Edit resep")),
+                        //       );
+                        //     },
+                        //     icon: const Icon(
+                        //       Icons.edit,
+                        //       color: AppColors.pinkDark,
+                        //     ),
+                        //     label: const Text(
+                        //       "Edit",
+                        //       style: TextStyle(
+                        //         fontWeight: FontWeight.bold,
+                        //         color: AppColors.pinkDark,
+                        //       ),
+                        //     ),
+                        //     style: OutlinedButton.styleFrom(
+                        //       padding: const EdgeInsets.symmetric(vertical: 14),
+                        //       side: const BorderSide(
+                        //         color: AppColors.pinkPrimary,
+                        //         width: 2,
+                        //       ),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(12),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 

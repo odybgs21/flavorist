@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../constant/colors.dart';
 import '../db/database_helper.dart';
+import 'recipe_detail_page.dart';
 
 class AllRecipesScreen extends StatefulWidget {
   const AllRecipesScreen({super.key});
@@ -48,42 +49,57 @@ class _AllRecipesScreenState extends State<AllRecipesScreen> {
             itemCount: recipes.length,
             itemBuilder: (context, index) {
               final recipe = recipes[index];
-              return _buildRecipeCard(context, recipe['imagePath'], recipe['title']);
+              return _buildRecipeCard(context, recipe);
             },
           );
         },
       ),
     );
   }
-
-  Widget _buildRecipeCard(BuildContext context, String imageUrl, String title) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.file(File(imageUrl), fit: BoxFit.cover),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+  
+  Widget _buildRecipeCard(BuildContext context, Map<String, dynamic> recipe) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RecipeDetailPage(
+              title: recipe['title'],
+              ingredients: recipe['ingredients'],
+              description: recipe['description'],
+              imagePath: recipe['imagePath'],
+            ),
+          ),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.file(File(recipe['imagePath']), fit: BoxFit.cover),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 10,
-            left: 10,
-            right: 10,
-            child: Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            Positioned(
+              bottom: 10,
+              left: 10,
+              right: 10,
+              child: Text(
+                recipe['title'],
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

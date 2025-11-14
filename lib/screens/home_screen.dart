@@ -6,6 +6,7 @@ import 'add_recipe_page.dart';
 import '../constant/colors.dart';
 import 'all_recipes_screen.dart';
 import '../db/database_helper.dart';
+import 'recipe_detail_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,12 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // Build carousel items from data and add "See More" card
     final List<Widget> trendingCarouselItems = [
-      ..._recipes.take(5).map((recipe) => _buildCarouselItem(context, recipe['imagePath'], recipe['title'])).toList(),
+      ..._recipes.take(5).map((recipe) => _buildCarouselItem(context, recipe)).toList(),
       _buildSeeMoreCard(context),
     ];
 
     final List<Widget> recentCarouselItems = [
-      ..._recipes.map((recipe) => _buildCarouselItem(context, recipe['imagePath'], recipe['title'])).toList(),
+      ..._recipes.map((recipe) => _buildCarouselItem(context, recipe)).toList(),
       _buildSeeMoreCard(context),
     ];
 
@@ -89,19 +90,19 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Resep Tranding", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                  const SizedBox(height: 10), 
-                  _recipes.isEmpty
-                      ? const Center(child: Text("Belum ada resep tranding."))
-                      : CarouselSlider(
-                          items: trendingCarouselItems,
-                          options: CarouselOptions(
-                            height: 150,
-                            viewportFraction: 0.8,
-                            enableInfiniteScroll: false,
-                            padEnds: false,
-                          ),
-                        ),
+                  // const Text("Resep Tranding", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
+                  // const SizedBox(height: 10), 
+                  // _recipes.isEmpty
+                  //     ? const Center(child: Text("Belum ada resep tranding."))
+                  //     : CarouselSlider(
+                  //         items: trendingCarouselItems,
+                  //         options: CarouselOptions(
+                  //           height: 150,
+                  //           viewportFraction: 0.8,
+                  //           enableInfiniteScroll: false,
+                  //           padEnds: false,
+                  //         ),
+                  //       ),
               
                   const SizedBox(height: 16),
                   const Text("Upload Terbaru", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
@@ -150,41 +151,59 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCarouselItem(BuildContext context, String imageUrl, String title) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.file(File(imageUrl), fit: BoxFit.cover),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+  Widget _buildCarouselItem(BuildContext context, Map<String, dynamic> recipe) {
+    final String imageUrl = recipe['imagePath'];
+    final String title = recipe['title'];
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RecipeDetailPage(
+              title: recipe['title'],
+              ingredients: recipe['ingredients'],
+              description: recipe['description'],
+              imagePath: recipe['imagePath'],
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.file(File(imageUrl), fit: BoxFit.cover),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 10,
-              left: 10,
-              right: 10,
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(blurRadius: 2.0, color: Colors.black54)],
+              Positioned(
+                bottom: 10,
+                left: 10,
+                right: 10,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    shadows: [Shadow(blurRadius: 2.0, color: Colors.black54)],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
