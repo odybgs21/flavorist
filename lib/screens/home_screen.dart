@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'add_recipe_page.dart';
 import '../constant/colors.dart';
+import 'all_recipes_screen.dart';
+import '../db/database_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,37 +15,50 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final db = DatabaseHelper();
+  List<Map<String, dynamic>> _recipes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecipes();
+  }
+
+  Future<void> _loadRecipes() async {
+    final recipes = await db.getRecipes();
+    setState(() {
+      _recipes = recipes;
+    });
+  }
+
+  void _navigateAndRefresh() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AddRecipePage()),
+    );
+
+    if (result == true) {
+      _loadRecipes();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Dummy data for carousels
-    final List<Map<String, String>> trendingRecipes = [
-      {"title": "Ayam Panggang Madu", "image": "https://www.mokapos.com/blog/_next/image?url=https%3A%2F%2Fwp.mokapos.com%2Fwp-content%2Fuploads%2F2023%2F02%2Finspirasi-foto-makanan-yang-enak-ayam-panggang.jpg&w=3840&q=75"},
-      {"title": "Sate Ayam Khas Madura", "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-      {"title": "Rendang Daging Sapi", "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=3424&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-    ];
-
-    final List<Map<String, String>> recentPosts = [
-      {"title": "Nasi Goreng Seafood", "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-      {"title": "Mie Ayam Bakso", "image": "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-      {"title": "Gado-Gado Siram", "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
-    ];
-
     // Build carousel items from data and add "See More" card
     final List<Widget> trendingCarouselItems = [
-      ...trendingRecipes.map((recipe) => _buildCarouselItem(context, recipe['image']!, recipe['title']!)).toList(),
+      ..._recipes.take(5).map((recipe) => _buildCarouselItem(context, recipe['imagePath'], recipe['title'])).toList(),
       _buildSeeMoreCard(context),
     ];
 
     final List<Widget> recentCarouselItems = [
-      ...recentPosts.map((recipe) => _buildCarouselItem(context, recipe['image']!, recipe['title']!)).toList(),
+      ..._recipes.map((recipe) => _buildCarouselItem(context, recipe['imagePath'], recipe['title'])).toList(),
       _buildSeeMoreCard(context),
     ];
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.pinkPrimary,
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const AddRecipePage())),
+        onPressed: _navigateAndRefresh,
         child: const Icon(Icons.edit_outlined, color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -73,22 +90,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text("Resep Tranding", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                  const SizedBox(height: 10),
-                  CarouselSlider(
-                    items: trendingCarouselItems,
-                    options: CarouselOptions(
-                      height: 150,
-                      viewportFraction: 0.8,
-                      enableInfiniteScroll: false,
-                      padEnds: false,
-                    ),
-                  ),
+                  const SizedBox(height: 10), 
+                  _recipes.isEmpty
+                      ? const Center(child: Text("Belum ada resep tranding."))
+                      : CarouselSlider(
+                          items: trendingCarouselItems,
+                          options: CarouselOptions(
+                            height: 150,
+                            viewportFraction: 0.8,
+                            enableInfiniteScroll: false,
+                            padEnds: false,
+                          ),
+                        ),
               
                   const SizedBox(height: 16),
                   const Text("Upload Terbaru", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
                   const SizedBox(height: 10),
-                  CarouselSlider(
-                    items: recentCarouselItems,
+                  _recipes.isEmpty
+                      ? const Center(child: Text("Belum ada resep yang diupload."))
+                      : CarouselSlider(
+                    items: recentCarouselItems, // Menggunakan data yang sama untuk contoh
                     options: CarouselOptions(
                       height: 150,
                       viewportFraction: 0.8,
@@ -137,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(imageUrl, fit: BoxFit.cover),
+            Image.file(File(imageUrl), fit: BoxFit.cover),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -171,7 +192,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildSeeMoreCard(BuildContext context) {
     return GestureDetector(
-      onTap: () { /* TODO: Navigate to see more page */ },
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AllRecipesScreen()),
+        );
+      },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.4,
         margin: const EdgeInsets.symmetric(horizontal: 5.0),

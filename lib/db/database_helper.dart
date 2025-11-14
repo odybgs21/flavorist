@@ -49,4 +49,15 @@ class DatabaseHelper {
     );
     return res.isNotEmpty ? res.first : null;
   }
+
+  Future<int> addRecipe(Map<String, dynamic> recipe) async {
+    var dbClient = await db;
+    return await dbClient.insert('recipes', recipe);
+  }
+
+  Future<List<Map<String, dynamic>>> getRecipes() async {
+    var dbClient = await db;
+    // Mengambil resep terbaru di atas
+    return await dbClient.query('recipes', orderBy: 'id DESC');
+  }
 }
