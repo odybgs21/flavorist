@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     final List<Widget> recentCarouselItems = [
-      ..._recipes.map((recipe) => _buildCarouselItem(context, recipe)).toList(),
+      ..._recipes.take(3).map((recipe) => _buildCarouselItem(context, recipe)).toList(),
       _buildSeeMoreCard(context),
     ];
 
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: AppColors.pinkLight.withValues(alpha: 0.6),
+                color: AppColors.pinkLight.withOpacity(0.6),
                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
                 boxShadow: [
                   BoxShadow(
